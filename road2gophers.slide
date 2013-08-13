@@ -1,0 +1,356 @@
+Gopher 之路
+2013-08-13
+
+# Go 是由 Google 开发的通用变成语言。
+# 这里将对 Go 语言进行大致的介绍，并对一些实践性的内容进行简要演示。
+
+邢星
+mikespook@gmail.com
+
+* 像罗马人一样
+
+When in Rome, do as the Romans do.
+
+When in Golang, do as the Gophers do.
+
+.image ./road2gophers/gopher_in_rome.png
+
+
+* Golang
+
+Go 是一个使得程序员更加有效率的开源项目。
+
+Go 是有表达力、简洁、清晰和有效率的。
+
+它的并行机制使其很容易编写多核和网络应用,而新奇的类型系统允许构建有弹性的模块化程序。
+
+Go 编译到机器码非常快速,同时具有便利的垃圾回收和强大的运行时反射。
+
+它是快速的、静态类型编译语言,但是感觉上是动态类型的,解释型语言。
+
+* 大道至简
+
+紧凑，但具有表达力
+
+静态类型和垃圾收集
+
+对象化，但不是面向类型的
+
+强大的并发支持
+
+高效的实现
+
+丰富的标准库
+
+快速的编译器
+
+弹性化的工具
+
+* Hello, World
+
+.play ./road2gophers/hello.go
+
+* 安装
+
+* 多种平台
+
+FreeBSD，Linux，Mac OS X 和 NetBSD 的打包文件
+
+.link http://code.google.com/p/go/downloads/list?q=OpSys-FreeBSD+OR+OpSys-Linux+OR+OpSys-OSX+OR+OpSys-NetBSD+Type-Archive
+
+Mac OS X 打包安装文件
+
+.link http://code.google.com/p/go/downloads/list?q=OpSys-OSX+Type-Installer
+
+Windows 的 MSI 和 zip 文件
+
+.link http://code.google.com/p/go/downloads/list?q=OpSys-Windows+Type%3DInstaller 
+
+.link http://code.google.com/p/go/downloads/list?q=OpSys-Windows+Type%3DArchive
+
+* 环境变量
+
+	export SERVICE_BASE=/home/mikespook
+
+	export GOBIN=$SERVICE_BASE/bin
+	export GOROOT=$SERVICE_BASE/golang/go
+	export GOPATH=$SERVICE_BASE/golang/3rdpkg:$SERVICE_BASE/golang/own:$GOROOT
+	export GOTOOLDIR=$GOROOT/pkg/tool
+	export PATH=$PATH:$GOBIN
+
+设置 GOARCH 和 GOOS 可以实现跨平台编译。
+
+* 最常见的错误
+
+	can't load package: .: path "/bla/bla/bla" not inside a GOPATH
+
+* 正确的目录列表
+
+	$GOROOT/
+	├── 3rdpkg
+	│   ├── pkg
+	│   └── src
+	├── go
+	└── own
+		├── pkg
+		└── src
+
+如包 `github.com/mikespook/golib`，Go 会在 GOPATH 的每个目录的 src 子目录中搜索其源代码；
+或在 GOPATH 的每个目录的 pkg 子目录中搜索编译后的二进制文件。
+
+`go get github.com/mikespook/golib` 会自动将代码放到 GOPATH 的第一个目录的 src 子目录中，这里就是：
+
+	$GOROOT/3rdpkg/src/github.com/mikespook/golib/
+
+* 最佳实践
+
+* 三项基本原则
+
+简单
+
+可读
+
+可维护
+
+* 示例代码
+
+.code road2gophers/shortercode1.go /GOPHER/,/DUMP/
+
+.code road2gophers/shortercode1.go /DUMP/,/MAIN/
+
+* 首先避免嵌套的错误处理
+
+.code road2gophers/shortercode2.go /DUMP/,/MAIN/
+
+对于读者来说，嵌套越少，记忆的负担越小
+
+* 尽量避免重复
+
+为示例代码编写的工具类型
+
+.code road2gophers/shortercode3.go /BINWRITER/,/DUMP/
+
+.code road2gophers/shortercode3.go /DUMP/,/MAIN/
+
+* 类型 switch 来处理特殊情况
+
+.code road2gophers/shortercode4.go /WRITE/,/DUMP/
+
+.code road2gophers/shortercode4.go /DUMP/,/MAIN/
+
+* 用短变量声明的类型 switch
+
+.code road2gophers/shortercode5.go /WRITE/,/DUMP/
+
+* 适配函数
+
+.code road2gophers/httphandler.go /HANDLER1/,/HANDLER2/
+
+* 适配函数
+
+.code road2gophers/httphandler.go /HANDLER2/,/END/
+
+* 代码组织
+
+* 首先是导入代码
+
+协议信息、编译标签和包文档。
+
+导入语句，相关的分组用空行分隔。
+
+	import (
+		"fmt"
+		"io"
+		"log"
+
+		"code.google.com/p/go.net/websocket"
+	)
+
+剩余部分的代码从重要的类型开始，最后是协助性的函数和类型。
+
+* 对代码编写文档
+
+最前面是包名和其相关的文档。
+
+	// Package playground registers an HTTP handler at "/compile" that
+	// proxies requests to the golang.org playground service.
+	package playground
+
+导出的标识会出现在 `godoc`中，它们的文档应当正确的编写。
+
+	// Author represents the person who wrote and/or is presenting the document.
+	type Author struct {
+		Elem []Elem
+	}
+
+	// TextElem returns the first text elements of the author details.
+	// This is used to display the author' name, job title, and company
+	// without the contact details.
+	func (p *Author) TextElem() (elems []Elem) {
+
+[[http://godoc.org/code.google.com/p/go.talks/pkg/present#Author][Generated documentation]]
+
+[[http://blog.golang.org/godoc-documenting-go-code][Gocode: documenting Go code]]
+
+* 越短越好
+
+至少 _更长并不总是更好_ 。
+
+尝试找到哪些 *可以自我解释的最短的名字* 。
+
+- `MarshalIndent` 比 `MarshalWithIndentation` 更好。
+
+别忘了包名将会出现再你的标识之前。
+
+- 在包 `encoding/json` 中有 `Encoder`，而不是 `JSONEncoder`。
+
+- 也就是 `json.Encoder`。
+
+* 有多个文件的包
+
+应当将包拆分到多个文件吗？
+
+- 避免非常长的文件
+
+标准库中的 `net/http` 包有 47 个文件，一共 15734 行。
+
+- 分离代码和测试
+
+`net/http/cookie.go` 和 `net/http/cookie_test.go` 都是 `http` 包的一部分。
+
+测试代码 *仅在* 测试时编译。
+
+- 拆分包文档
+
+当一个包有多个文件时，就应当创建包含文档的 `doc.go` 文件。
+
+* 让包可以 "go get"
+
+一些包可能可以复用，而另一些不行。
+
+定义网络协议的包可能可以复用，而可执行命令则不行。
+
+.image road2gophers/cmd.png
+
+[[https://github.com/bradfitz/camlistore]]
+
+* API
+
+* 找对需求
+
+Let's use the Gopher type from before
+
+.code road2gophers/shortercode1.go /GOPHER/,/DUMP/
+
+可以定义这个方法
+
+.code road2gophers/shortercode1.go /DumpToFile/,/DumpToFile/
+
+但是使用静态类型使得这个代码难以测试，因此使用一个接口。
+
+.code road2gophers/shortercode1.go /DumpToReadWriter/,/DumpToReadWriter/
+
+而，一旦使用了接口，就应当只请求那些必要的方法。
+
+.code road2gophers/shortercode1.go /DumpToWriter/,/DumpToWriter/
+
+* 让无依赖的包无依赖
+
+.code road2gophers/funcdraw/cmd/funcdraw.go /IMPORT/,/ENDIMPORT/
+
+.code road2gophers/funcdraw/cmd/funcdraw.go /START/,/END/
+
+* 解析
+
+.code road2gophers/funcdraw/parser/parser.go /START/,/END/
+
+* 绘制
+
+.code road2gophers/funcdraw/drawer/dependent.go /START/,/END/
+
+用接口来避免依赖。
+
+.code road2gophers/funcdraw/drawer/drawer.go /START/,/END/
+
+* 测试
+
+使用接口来代替静态方法，让测试更加容易。
+
+.code road2gophers/funcdraw/drawer/drawer_test.go ,/END/
+
+* 在 API 中避免并发
+
+.play road2gophers/concurrency1.go /START/,/END/
+
+如果想顺序调用应该怎么办？
+
+* 在 API 中避免并发
+
+.play road2gophers/concurrency2.go /START/,/END/
+
+暴露同步接口，并发的调用它们很容易。
+
+* 并发的最佳实践
+
+* 使用 goroutine 管理状态
+
+通过一个 channel 或，或含有 channel 的 struct 来和 goroutine 通讯
+
+.code road2gophers/server.go /START/,/STOP/
+
+* 使用 goroutine 管理状态
+
+.play road2gophers/server.go /STOP/,
+
+* 通过缓冲 channel 避免 goroutine 泄漏
+
+.code road2gophers/bufchan.go /SEND/,/BROADCAST/
+
+.code road2gophers/bufchan.go /MAIN/,
+
+* 通过缓冲 channel 避免 goroutine 泄漏
+
+.play road2gophers/bufchan.go /BROADCAST/,/MAIN/
+
+- goroutine 在 channel 写入的时候被阻塞
+- goroutine 持有 channel 的引用
+- channel 永远不会被回收
+
+* 通过缓冲 channel 避免 goroutine 泄漏
+
+.play road2gophers/bufchanfix.go /BROADCAST/,/MAIN/
+
+- 如果我们无法预知 channel 的容量呢？
+
+* 通过退出 channel 避免 goroutine 泄漏
+
+.play road2gophers/quitchan.go /BROADCAST/,/MAIN/
+
+* 12 条最佳实践
+
+1. 首先避免嵌套的错误处理
+2. 尽可能避免重复
+3. 首先是导入代码
+4. 对代码编写文档
+5. 越短越好
+6. 将包拆分为多个文件
+7. 让包可以 "go get"
+8. 按需使用
+9. 让没有依赖的包没有依赖
+10. 避免在 API 中并发
+11. 使用 goroutine 管理状态
+12. 避免 goroutine 泄漏
+
+* 一些链接
+
+资源
+
+- Go homepage [[http://golang.org]]
+- Go 指南 [[http://go-tour-zh.appsp0t.com]]
+- 学习 Go 语言 [[http://www.mikespook.com/learning-go/]]
+- 大道至简 [[http://www.mikespook.com/2012/06/%e7%bf%bb%e8%af%91%e5%b0%91%e6%98%af%e6%8c%87%e6%95%b0%e7%ba%a7%e7%9a%84%e5%a4%9a/][link]]
+- Go 环境设置 [[http://www.mikespook.com/2012/02/%e7%bf%bb%e8%af%91go-%e7%8e%af%e5%a2%83%e8%ae%be%e7%bd%ae/][link]]
+- Go 1.1 介绍 [[http://www.mikespook.com/2013/03/%E7%BF%BB%E8%AF%91-go-1-1-%E4%BB%8B%E7%BB%8D/][link]]
+- Ubuntu 下的 Go 源码安装脚本 [[https://raw.github.com/mikespook/z-node/master/shell/golang-install.sh][download]]
+
+关于实践的内容来自[[http://talks.golang.org/2013/bestpractices.slide][Twelve Go Best Practices]]。
